@@ -73,20 +73,10 @@ streamlit run app/app.py
 
 1. Within the app, select whether you want the BM25 or Semantic Search model for regular search or the RAG tab for LLM assisted search. Then, type your query in the search-bar.
 
-## Cloud Deployment (Posit Connect Cloud)
-The cloud deployment uses **pre-built indexes** that are committed to the repository: `data/processed/products.pkl`, `data/processed/bm25_index.pkl` and `data/processed/faiss_index/` (10,000 products, about 51 MB). The app loads them at startup, so it is ready in seconds. Building the indexes on the cloud host instead was too slow (about 16 minutes on its CPU) and ran out of memory.
+## Cloud Deployment
+Try the app online, no setup needed: **https://01a1f620-0b1b-d41e-fc88-e0f4f6c2f98e.share.connect.posit.cloud/**
 
-You can still build the indexes yourself locally, for example to change the number of products:
-```bash
-python src/utils2.py --rebuild --max-products 10000
-```
-If you rebuild, commit the updated `products.pkl`, `bm25_index.pkl` and `faiss_index/` before redeploying. If those files are ever missing, the app falls back to building them at startup from the committed parquet files (see `src/artifacts.py`), which needs more memory and takes several minutes.
-
-To deploy:
-1. In Posit Connect Cloud, publish from GitHub, pick this repository and branch, and set the primary file to `app/app.py`.
-1. Choose **Python 3.11** (dependencies are installed from `requirements.txt` automatically).
-1. Add `GROQ_API_KEY` and `TAVILY_API_KEY` as secret variables.
-1. If the app is stopped for running out of memory, raise the memory limit in the content's settings.
+The live app is hosted on Posit Connect Cloud and runs from the `cloud-deployment` branch. For the deployment, we pre-built the search indexes (10,000 products) and committed them to that branch, so the app starts in seconds. Building the indexes on the cloud server instead was too slow (an estimated 16 minutes on its CPU) and ran out of memory before finishing. To build the indexes yourself and run the app locally, follow [Getting Started](#getting-started).
 
 ## Web Search Tool Call
 The RAG pipeline have web search capability via Tavily. The pipeline uses the LLM to determine if a query requires web information. If triggered, the web results are combined with the other data for a better answer.
