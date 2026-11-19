@@ -45,7 +45,7 @@ class RAG_Pipeline:
             exit(1) 
 
         llm = ChatGroq(
-            model="qwen/qwen3-32b",
+            model="openai/gpt-oss-120b",
             temperature=0.3,
             max_tokens=None,
             reasoning_format="parsed",
