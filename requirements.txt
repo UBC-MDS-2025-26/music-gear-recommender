@@ -1,0 +1,21 @@
+# Pinned to the versions in the local dsci575_td environment (Python 3.10).
+# Use the CPU-only PyTorch build so cloud installs don't pull multi-GB CUDA wheels.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.11.0+cpu
+
+streamlit==1.65.0
+pandas==2.3.3
+pyarrow==23.0.1
+numpy==2.2.6
+nltk==3.10.3
+tqdm==4.70.0
+rank-bm25==0.2.2
+faiss-cpu==1.16.0
+sentence-transformers==6.3.0
+transformers==5.5.3
+langchain-core==1.7.7
+langchain-community==0.4.2
+langchain-groq==1.1.3
+groq==0.37.1
+tavily-python==0.8.5
+python-dotenv==1.2.4
