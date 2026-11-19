@@ -52,7 +52,7 @@ def tokenize(text):
     text = re.sub(r"[^a-z0-9\s-]", "", text)
     return [stemmer.stem(w) for w in text.split() if w not in stop_words]
 
-def review_matching(review_path, k=3):
+def review_matching(review_path, k=3, asins=None):
     """Select the top-k most helpful reviews per product from a parquet file.
 
     Vectorized replacement for the old iterrows+heap version: loads only the
@@ -62,15 +62,20 @@ def review_matching(review_path, k=3):
     Args:
         review_path: Path to the reviews parquet file.
         k: Number of top reviews to keep per product, default 3.
+        asins: Optional collection of parent_asin values. When given, only
+            reviews for these products are read from disk, which keeps memory
+            low when indexing a subset (e.g. on a cloud deployment).
 
     Returns:
         A dict mapping parent_asin (str) to a list of review text strings,
         ordered from most to least helpful.
     """
+    filters = [("parent_asin", "in", list(asins))] if asins is not None else None
     df = pd.read_parquet(
         review_path,
         columns=["parent_asin", "helpful_vote", "text"],
         engine="pyarrow",
+        filters=filters,
     )
     df["helpful_vote"] = df["helpful_vote"].fillna(0)
     # Sort once, then take head(k) per group
@@ -96,16 +101,18 @@ def build_corpus_index(meta_path, review_path, output_dir, k=3, max_products=Non
         k: Number of top reviews per product, default 3.
         max_products: If set, only process the first n products (useful for dev).
     """
-    reviews_dict = review_matching(review_path, k)
-
     print("Loading data from parquet...")
 
     # Only load the columns we need, and convert features and description to lists if they are stored as arrays
-    df = pd.read_parquet(meta_path, 
-                         engine="pyarrow", 
+    df = pd.read_parquet(meta_path,
+                         engine="pyarrow",
                          columns=["parent_asin", "title", "features", "description", "average_rating"])
     if max_products:
         df = df.head(max_products)
+
+    # Only read reviews for the products we're indexing
+    reviews_dict = review_matching(review_path, k, asins=set(df["parent_asin"]))
+
     products = df.to_dict('records')
     for p in products:
         if isinstance(p.get('features'), np.ndarray):
@@ -118,7 +125,7 @@ def build_corpus_index(meta_path, review_path, output_dir, k=3, max_products=Non
     corpus = []
     for product in products:
         asin = product['parent_asin']
-        reviews = " ".join(reviews_dict[asin])  # 
+        reviews = " ".join(reviews_dict.get(asin, []))
         part = f"""Title: {product.get("title", "")} |
 Features: {", ".join(product.get("features", []))} |
 Description: {". ".join(product.get("description", []))} |

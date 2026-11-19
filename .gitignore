@@ -4,3 +4,7 @@ __pycache__/
 *.py[cod]
 *.pyo
 .ipynb_checkpoints/
+
+# Generated at startup by src/artifacts.py
+data/processed/*.pkl
+data/processed/faiss_index/

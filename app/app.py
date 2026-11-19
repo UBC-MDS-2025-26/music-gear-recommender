@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import sys
 import re
@@ -12,6 +13,7 @@ from src.bm25 import load_index as bm25_load, bm25_search
 from src.semantic import load_faiss_index, semantic_search
 from src.hybrid import load_indexes
 from src.rag_pipeline import HybridRAGPipeline
+from src.artifacts import artifacts_ready, ensure_artifacts
 
 data_dir = project_root / "data" / "processed"
 
@@ -132,6 +134,13 @@ st.markdown(
 )
 
 
+@st.cache_resource(show_spinner=False)
+def build_artifacts():
+    """Build missing indexes once per server process (first boot on the cloud)."""
+    ensure_artifacts(data_dir)
+    return True
+
+
 @st.cache_resource
 def load_bm25():
     return bm25_load(data_dir)
@@ -201,6 +210,10 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+if not artifacts_ready(data_dir):
+    with st.spinner("First start: building search indexes. This can take several minutes..."):
+        build_artifacts()
+
 with st.spinner("Loading search indexes..."):
     bm25_index, products_bm25 = load_bm25()
     vector_store, products_sem = load_semantic()
@@ -233,7 +246,10 @@ with rag:
     query = st.text_input("Ask a question",
                           placeholder="e.g. What's a good beginner digital piano with weighted keys?",
                           key="rag_query")
-    if query:
+    if query and not os.environ.get("GROQ_API_KEY"):
+        # rag_pipeline.query() calls exit(1) without a key, which would kill the app.
+        st.error("GROQ_API_KEY is not set. Add it as an environment variable (or in .env locally) to use RAG.")
+    elif query:
         with st.spinner("Thinking..."):
             results, docs = rag_pipeline.query(query, k=5)
 

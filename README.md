@@ -73,6 +73,17 @@ streamlit run app/app.py
 
 1. Within the app, select whether you want the BM25 or Semantic Search model for regular search or the RAG tab for LLM assisted search. Then, type your query in the search-bar.
 
+## Cloud Deployment (Posit Connect Cloud)
+The built indexes (`products.pkl`, `bm25_index.pkl`, `faiss_index/`, ...) are not committed. On startup, the app checks `data/processed/` and, if anything is missing, rebuilds it from the committed `filtered_meta.parquet` and `filtered_reviews.parquet` (see `src/artifacts.py`). The first visit after a deploy or restart therefore takes several minutes; later visits reuse the built files.
+
+To deploy:
+1. In Posit Connect Cloud, publish from GitHub, pick this repository and branch, and set the primary file to `app/app.py`.
+1. Choose **Python 3.10** to match the pins in `requirements.txt` (dependencies are installed from it automatically).
+1. Add `GROQ_API_KEY` and `TAVILY_API_KEY` as secret variables.
+1. Optional: set `MAX_PRODUCTS` (default `10000`) to index fewer products for a faster cold start.
+
+You can also pre-build the indexes locally with `python src/artifacts.py`.
+
 ## Web Search Tool Call
 The RAG pipeline have web search capability via Tavily. The pipeline uses the LLM to determine if a query requires web information. If triggered, the web results are combined with the other data for a better answer.
 
