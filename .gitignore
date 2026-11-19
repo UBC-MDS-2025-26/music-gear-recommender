@@ -5,6 +5,7 @@ __pycache__/
 *.pyo
 .ipynb_checkpoints/
 
-# Generated at startup by src/artifacts.py
-data/processed/*.pkl
-data/processed/faiss_index/
+# Intermediate build outputs not needed by the app.
+# products.pkl, bm25_index.pkl and faiss_index/ ARE committed (prebuilt for deployment).
+data/processed/corpus.pkl
+data/processed/embeddings.pkl

@@ -9,8 +9,8 @@ project_root = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / "src"))
 
-from src.bm25 import load_index as bm25_load, bm25_search
-from src.semantic import load_faiss_index, semantic_search
+from src.bm25 import bm25_search
+from src.semantic import semantic_search
 from src.hybrid import load_indexes
 from src.rag_pipeline import HybridRAGPipeline
 from src.artifacts import artifacts_ready, ensure_artifacts
@@ -142,18 +142,8 @@ def build_artifacts():
 
 
 @st.cache_resource
-def load_bm25():
-    return bm25_load(data_dir)
-
-
-@st.cache_resource
-def load_semantic():
-    index_path = data_dir / "faiss_index"
-    return load_faiss_index(index_path, data_dir)
-
-
-@st.cache_resource
 def load_hybrid():
+    """Load FAISS, BM25 and products once; the search tab reuses the same objects."""
     index_path = data_dir / "faiss_index"
     return load_indexes(data_dir, index_path)
 
@@ -215,10 +205,13 @@ if not artifacts_ready(data_dir):
         build_artifacts()
 
 with st.spinner("Loading search indexes..."):
-    bm25_index, products_bm25 = load_bm25()
-    vector_store, products_sem = load_semantic()
     hybrid_retriever = load_hybrid()
     rag_pipeline = HybridRAGPipeline(hybrid_retriever)
+
+# One shared copy of each index keeps memory low on the cloud host.
+bm25_index = hybrid_retriever.bm25_index
+vector_store = hybrid_retriever.vector_store
+products = hybrid_retriever.products
 
 search, rag = st.tabs(["🔎  Search", "✨  Ask (RAG)"])
 
@@ -231,9 +224,9 @@ with search:
 
     if query:
         if method == "BM25":
-            results = bm25_search(query, bm25_index, products_bm25, top_k=3)
+            results = bm25_search(query, bm25_index, products, top_k=3)
         else:
-            results = semantic_search(query, vector_store, products_sem, k=3)
+            results = semantic_search(query, vector_store, products, k=3)
 
         st.markdown(f'<div class="section-label">Top {len(results)} results · {method}</div>',
                     unsafe_allow_html=True)
