@@ -1,4 +1,5 @@
-# Pinned to the versions in the local dsci575_td environment (Python 3.10).
+# Pinned to the versions in the local dsci575_td environment.
+# Verified to install on Python 3.11 (Linux x86_64) for Posit Connect Cloud, and 3.10 locally.
 # Use the CPU-only PyTorch build so cloud installs don't pull multi-GB CUDA wheels.
 --extra-index-url https://download.pytorch.org/whl/cpu
 torch==2.11.0+cpu

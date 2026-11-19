@@ -78,7 +78,7 @@ The built indexes (`products.pkl`, `bm25_index.pkl`, `faiss_index/`, ...) are no
 
 To deploy:
 1. In Posit Connect Cloud, publish from GitHub, pick this repository and branch, and set the primary file to `app/app.py`.
-1. Choose **Python 3.10** to match the pins in `requirements.txt` (dependencies are installed from it automatically).
+1. Choose **Python 3.11** (dependencies are installed from `requirements.txt` automatically).
 1. Add `GROQ_API_KEY` and `TAVILY_API_KEY` as secret variables.
 1. Optional: set `MAX_PRODUCTS` (default `10000`) to index fewer products for a faster cold start.
 
