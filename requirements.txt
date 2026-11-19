@@ -1,8 +1,11 @@
 # Pinned to the versions in the local dsci575_td environment.
 # Verified to install on Python 3.11 (Linux x86_64) for Posit Connect Cloud, and 3.10 locally.
-# Use the CPU-only PyTorch build so cloud installs don't pull multi-GB CUDA wheels.
---extra-index-url https://download.pytorch.org/whl/cpu
-torch==2.11.0+cpu
+# On Linux (Posit Connect Cloud, Python 3.11), install the CPU-only PyTorch wheel by
+# direct URL so the build doesn't pull multi-GB CUDA packages. A direct URL is used
+# instead of --extra-index-url because Posit's installer can't resolve other packages
+# when an extra index is set. Everywhere else, the regular PyPI wheel is used.
+torch @ https://download.pytorch.org/whl/cpu/torch-2.11.0%2Bcpu-cp311-cp311-manylinux_2_28_x86_64.whl ; sys_platform == "linux" and platform_machine == "x86_64" and python_version == "3.11"
+torch==2.11.0 ; sys_platform != "linux" or platform_machine != "x86_64" or python_version != "3.11"
 
 streamlit==1.65.0
 pandas==2.3.3
