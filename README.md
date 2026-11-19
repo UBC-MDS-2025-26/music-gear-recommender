@@ -73,6 +73,11 @@ streamlit run app/app.py
 
 1. Within the app, select whether you want the BM25 or Semantic Search model for regular search or the RAG tab for LLM assisted search. Then, type your query in the search-bar.
 
+## Cloud Deployment
+Try the app online, no setup needed: **https://01a1f620-0b1b-d41e-fc88-e0f4f6c2f98e.share.connect.posit.cloud/**
+
+The live app is hosted on Posit Connect Cloud and runs from the `cloud-deployment` branch. For the deployment, we pre-built the search indexes (10,000 products) and committed them to that branch, so the app starts in seconds. Building the indexes on the cloud server instead was too slow (an estimated 16 minutes on its CPU) and ran out of memory before finishing. To build the indexes yourself and run the app locally, follow [Getting Started](#getting-started).
+
 ## Web Search Tool Call
 The RAG pipeline have web search capability via Tavily. The pipeline uses the LLM to determine if a query requires web information. If triggered, the web results are combined with the other data for a better answer.
 
