@@ -1,5 +1,5 @@
-# DSCI 575 Group Project
-This App is designed to help musical enthusiasts find the most appropriate suggestions for shopping on Amazon. 
+# Amazon Musical Instrument & Equipment Recommender
+This App is designed to help musical enthusiasts find the most appropriate suggestions for shopping on Amazon. Built as a DSCI 575 group project.
 
 ## Dataset Description
 This is a large-scale Amazon Reviews dataset collected in 2023 by McAuley Lab, and it includes rich features such as:
@@ -40,8 +40,8 @@ Both scripts load their respective indexes and accept a --query and --k argument
 
 1. Clone the repo to your local device
 ```bash
-git clone git@github.com:UBC-MDS/DSCI_575_project_tyin98_danieljy.git
-cd DSCI_575_project_tyin98_danieljy
+git clone git@github.com:UBC-MDS-2025-26/music-gear-recommender.git
+cd music-gear-recommender
 ```
 2. Create the environment to run the app
 ```bash
